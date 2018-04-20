@@ -1,7 +1,8 @@
 import numpy as np
-import os
 
-# Given pose (x, y, z, yaw, pitch, roll)
+# Given pose (x, y, z, yaw, pitch, roll) and depth image
+# Convert depth image to a voxel (relative to pose)
+# Combine the individual voxels into one voxel map
 
 
 class Voxel:
@@ -47,29 +48,19 @@ class Voxel:
 
             # Compress x dimension from 1280 to 16 by averaging
             for i in range(x_dim):
-                # print(i)
-                # print((row[int(i * x_chunk_size):int((i + 1) * x_chunk_size)]))
-                # print(len(row[int(i*x_chunk_size):int((i+1)*x_chunk_size)]))
                 new_avg = np.average(row[int(i*x_chunk_size):int((i+1)*x_chunk_size)])
                 temp_depth_map[j][i] = new_avg
                 # print(temp_depth_map[j])
 
             # Compress y dimension from 720 to 16 by averaging
             if j % y_chunk_size == y_chunk_size - 1:
-                # print(int(y_chunk_size) + 1)
-                # print(np.average(temp_depth_map[j - int(y_chunk_size) + 1:j], axis=0))
                 depth_map_comp[row_idx] = np.average(temp_depth_map[j - int(y_chunk_size) + 1:j], axis=0)
                 row_idx += 1
 
             j += 1
 
-        # print("Depth map compressed: ")
-        # print(depth_map_comp)
-
         # Scale the z's from 0 to 8
         depth_map_comp = depth_map_comp * float(z_dim)/(self.depth_max - self.depth_min)
-        # print("Depth map compressed & scaled: ")
-        # print(depth_map_comp)
 
         voxel = np.zeros((x_dim, y_dim, z_dim))
 
@@ -80,7 +71,6 @@ class Voxel:
                 voxel[i][j][z] = 1
 
         self.voxel = voxel
-        # print(voxel)
 
 
 # Test with a randomly generated depth map:
