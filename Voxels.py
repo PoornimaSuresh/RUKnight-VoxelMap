@@ -9,10 +9,10 @@ class Voxel:
     def __init__(self):
         self.vox_dim = (16, 16, 8)
         self.depth_dim = (720, 1280)
-        self.pose = (0, 0, 0, 0, 0, 0)
-        self.depth_min = 0
-        self.depth_max = 42
-        self.voxel = np.zeros(self.vox_dim)
+        self.pose = (0, 0, 0, 0, 0, 0)      # initialized to origin
+        self.depth_min = 0                  # arbitrary, must be replaced with actual min depth from depth frame
+        self.depth_max = 42                 # arbitrary, must be replaced with actual max depth from depth frame
+        self.voxel = np.array([])
 
     def set_pose(self, x, y, z, roll, pitch, yaw):
         self.pose = (x, y, z, roll, pitch, yaw)
@@ -82,7 +82,7 @@ class Voxel:
         self.voxel = voxel
         # print(voxel)
 
-        
+
 # Test with a randomly generated depth map:
 '''
 v = Voxel()
