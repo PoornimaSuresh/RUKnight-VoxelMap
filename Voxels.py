@@ -1,4 +1,5 @@
 import numpy as np
+from math import sin, cos, tan
 
 # Given pose (x, y, z, yaw, pitch, roll) and depth image
 # Convert depth image to a voxel (relative to pose)
@@ -41,7 +42,7 @@ class Voxel:
         depth_map_comp = np.zeros((x_dim, y_dim))
         temp_depth_map = np.zeros((x_range, y_dim))
 
-        # Compress to a 16 x 16 depth map
+        # Compress to a 16 x 16 depth map (will be changed later to support multiple resolutions in octree)
         row_idx = 0
         j = 0
         for row in depth_map:
@@ -71,6 +72,38 @@ class Voxel:
                 voxel[i][j][z] = 1
 
         self.voxel = voxel
+
+
+class VoxelMap:
+
+    def __init__(self):
+        self.voxel_map = np.asarray([])
+
+
+    def transform(self, pose):
+        x = pose[0]
+        y = pose[1]
+        z = pose[2]
+        roll = pose[3]
+        pitch = pose[4]
+        yaw = pose[5]
+        M = [[cos(yaw)*cos(pitch), -cos(yaw)*sin(pitch)*sin(roll)-sin(yaw)*cos(roll), -cos(yaw)*sin(pitch)*cos(roll)+sin(yaw)*sin(roll), x],
+             [sin(yaw)*cos(pitch), -sin(yaw)*sin(pitch)*sin(roll)+cos(yaw)*cos(roll), -sin(yaw)*sin(pitch)*cos(roll)-cos(yaw)*sin(roll), y],
+             [sin(pitch), cos(pitch)*sin(roll), cos(pitch)*sin(roll), z]]
+        return M
+
+    # Combine a collection of voxels and poses into one large voxel
+    def aggregate(self, voxels, poses):
+        ind = 0
+        for voxel in voxels:
+            M = self.transform(poses[ind])
+            global_voxel = np.dot(voxel, M)
+
+            '''TODO: combine transformed voxel to global map'''
+
+            ind += 1
+
+
 
 
 # Test with a randomly generated depth map:
